@@ -1,15 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 import Board from './domain/Board';
 import Slot from './domain/Slot';
+
+const SHAKE_ANIMATION_DURATION = 300;
 
 function App() {
   const [board] = useState(new Board());
 
   const [, setTick] = useState<{}>();
 
-  const [canMove, setCanMove] = useState<boolean>(true);
+  const [moveError, setMoveError] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (moveError) {
+      const timeoutId = setTimeout(() => {
+        setMoveError(false)
+      }, SHAKE_ANIMATION_DURATION);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [moveError]);
 
   const onSlotClick = (slot: Slot) => () => {
     // if there are any currently possible moves available, check for the one
@@ -20,10 +32,7 @@ function App() {
         console.log('apply move!');
         selectedMove.apply();
       } else {
-        setCanMove(false);
-        setTimeout(() => {
-          setCanMove(true);
-        }, 300);
+        setMoveError(true);
         console.log('reset...');
       }
 
@@ -59,10 +68,7 @@ function App() {
 
       if (board.moves.isEmpty()) {
         console.log('no available moves from there...!');
-        setCanMove(false);
-        setTimeout(() => {
-          setCanMove(true);
-        }, 300);
+        setMoveError(true);
       }
 
       // show available moves
@@ -78,53 +84,54 @@ function App() {
     }
 
     console.log('cannot move from there...');
-    setCanMove(false);
-    setTimeout(() => {
-      setCanMove(true);
-    }, 300);
+    setMoveError(true);
   };
 
   return (
-    <div
-      className={clsx(
-        'w-fit m-8 p-4 bg-amber-100 shadow-lg rounded-lg border border-orange-200',
-        {
-          'animate-shake': !canMove,
-        }
-      )}
-    >
-      {board.grid.map((row, index) => (
-        <div className="flex" key={`${index}`}>
-          {row.map((slot) => (
-            <div
-              className="relative w-16 h-16"
-              key={`${slot.x}-${slot.y}`}
-              onClick={onSlotClick(slot)}
-            >
-              <span
-                className={clsx(
-                  {
-                    'absolute w-10 h-10 m-3 rounded-full border border-orange-400':
-                      slot.state !== 'none',
-                  },
-                  {
-                    '!border-orange-300 shadow-inner-lg shadow-yellow-500':
-                      slot.state === 'empty',
-                  },
-                  {
-                    'bg-orange-300 shadow-md shadow-yellow-500 hover:bg-orange-400 cursor-pointer':
-                      slot.state === 'filled',
-                  },
-                  {
-                    '!bg-emerald-100 cursor-pointer': slot.canReceive,
-                  }
-                )}
-              ></span>
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
+    <>
+      <h1 className='text-center text-3xl font-semibold text-slate-600 my-4'>The Pin Game</h1>
+      <h2 className='text-center text-xl text-slate-600'>Only one pin can survive!</h2>
+      <div
+        className={clsx(
+          'mx-auto w-fit m-8 p-4 bg-amber-100 shadow-lg rounded-lg border border-orange-200',
+          {
+            'animate-shake': moveError,
+          }
+        )}
+      >
+        {board.grid.map((row, index) => (
+          <div className="flex" key={`${index}`}>
+            {row.map((slot) => (
+              <div
+                className="relative w-16 h-16"
+                key={`${slot.x}-${slot.y}`}
+                onClick={onSlotClick(slot)}
+              >
+                <span
+                  className={clsx(
+                    {
+                      'absolute w-10 h-10 m-3 rounded-full border border-orange-400':
+                        slot.state !== 'none',
+                    },
+                    {
+                      '!border-orange-300 shadow-inner-lg shadow-yellow-500':
+                        slot.state === 'empty',
+                    },
+                    {
+                      'bg-orange-300 shadow-md shadow-yellow-500 hover:bg-orange-400 cursor-pointer':
+                        slot.state === 'filled',
+                    },
+                    {
+                      '!bg-emerald-100 cursor-pointer': slot.canReceive,
+                    }
+                  )}
+                ></span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
