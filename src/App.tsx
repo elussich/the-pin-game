@@ -30,7 +30,11 @@ function App() {
       const selectedMove = board.moves.getSelectedMove(slot);
       if (selectedMove) {
         console.log('apply move!');
+        // @todo abstract out this operation within Board class
         selectedMove.apply();
+        board.addFilledSlot(selectedMove.slotDest);
+        board.removeFilledSlot(selectedMove.slotSrc);
+        board.removeFilledSlot(selectedMove.slotToRemove);
       } else {
         setMoveError(true);
         console.log('reset...');
@@ -44,11 +48,13 @@ function App() {
 
       // global moves check
       const adjacentFilledSlots = board.adjacentFilledSlots;
+      const filledSlots = board.getFilledSlots();
       console.log('adjacentFilledSlots:', adjacentFilledSlots);
+      console.log('filledSlots:', filledSlots);
 
       if (adjacentFilledSlots === 0) {
         // if only one filled slot is left, game is won!
-        if (board.getFilledSlots().length === 1) {
+        if (filledSlots.size === 1) {
           console.log('you win!');
         }
 

@@ -6,10 +6,19 @@ export default class Board {
   public grid: Array<Slot[]> = [];
   public moves = new Moves();
   private adjacentFilledSlotsCount = 0;
-  private filledSlots: Slot[] = [];
+  private filledSlots: Set<Slot> = new Set();
 
   constructor() {
     this.create();
+
+    // @todo wonder if filled slot tracking can be done along grid creation
+    this.grid.forEach(row => {
+      row.forEach(slot => {
+        if (slot.state === 'filled') {
+          this.filledSlots.add(slot);
+        }
+      });
+    });
   }
 
   private create() {
@@ -106,12 +115,9 @@ export default class Board {
 
   public get adjacentFilledSlots(): number {
     this.adjacentFilledSlotsCount = 0;
-    this.filledSlots = [];
     this.grid.forEach((row: Slot[]) => {
       row.forEach((slot: Slot) => {
-        // @todo keep a collection of filled slots
         if (slot.state === 'filled') {
-          this.filledSlots.push(slot);
           Object.keys(this.slotLocator).forEach((direction: string) => {
             const adjacentSlot = this.slotLocator[direction](slot);
             if (adjacentSlot?.state === 'filled') {
@@ -125,8 +131,16 @@ export default class Board {
     return this.adjacentFilledSlotsCount;
   }
 
-  public getFilledSlots(): Slot[] {
+  public getFilledSlots(): Set<Slot> {
     return this.filledSlots;
+  }
+
+  public addFilledSlot(slot: Slot) {
+    this.filledSlots.add(slot);
+  }
+
+  public removeFilledSlot(slot: Slot) {
+    this.filledSlots.delete(slot);
   }
 
   public print() {
