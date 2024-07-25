@@ -5,7 +5,7 @@ import Slot from './Slot';
 export default class Board {
   public grid: Array<Slot[]> = [];
   public moves = new Moves();
-  private adjacentFilledSlotsCount: number;
+  private adjacentFilledSlotsCount = 0;
   private filledSlots: Slot[] = [];
 
   constructor() {

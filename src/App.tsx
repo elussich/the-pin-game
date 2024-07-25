@@ -87,7 +87,7 @@ function App() {
   return (
     <div
       className={clsx(
-        'w-fit m-8 bg-amber-100 shadow-lg rounded-lg border border-orange-200',
+        'w-fit m-8 p-4 bg-amber-100 shadow-lg rounded-lg border border-orange-200',
         {
           'animate-shake': !canMove,
         }

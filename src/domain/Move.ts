@@ -1,9 +1,6 @@
 import Slot from './Slot';
 
-type MoveState = 'idle' | 'start' | 'moving' | 'done' | 'aborting';
-
 export default class Move {
-  private state = 'idle';
   public slotSrc: Slot;
   public slotDest: Slot;
   public slotToRemove: Slot;
