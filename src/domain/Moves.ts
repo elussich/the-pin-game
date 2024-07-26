@@ -16,15 +16,29 @@ export default class Moves {
     return this.moves.length === 0;
   }
 
-  public getSelectedMove(slot: Slot): Move | undefined {
+  /**
+   * Finds move within internal moves array which corresponds to the specified
+   * destination slot.
+   * 
+   * Returns `undefined` if no move is found.
+   * 
+   * @param slot 
+   * @returns 
+   */
+  public getMoveTo(slot: Slot): Move | undefined {
     return this.moves.find((move: Move | undefined) => {
-      return move?.slotDest === slot;
+      return move?.destinationSlot === slot;
     });
   }
 
-  public toggle(visible: boolean) {
+  /**
+   * Toggles `isMoveDestination` flag for every destination slot.
+   * 
+   * @param {boolean} isMoveDestination - Flag to be toggled.
+   */
+  public toggleMovesDestination(isMoveDestination: boolean) {
     this.moves.forEach((move: Move) => {
-      move.slotDest.canReceive = visible;
+      move.destinationSlot.isMoveDestination = isMoveDestination;
     });
   }
 }

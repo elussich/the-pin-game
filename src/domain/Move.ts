@@ -1,14 +1,14 @@
 import Slot from './Slot';
 
 export default class Move {
-  public slotSrc: Slot;
-  public slotDest: Slot;
-  public slotToRemove: Slot;
+  public sourceSlot: Slot;
+  public destinationSlot: Slot;
+  public middleSlot: Slot;
 
-  constructor(slotSource: Slot, slotDest: Slot, slotToRemove: Slot) {
-    this.slotSrc = slotSource;
-    this.slotDest = slotDest;
-    this.slotToRemove = slotToRemove;
+  constructor(sourceSlot: Slot, destinationSlot: Slot, middleSlot: Slot) {
+    this.sourceSlot = sourceSlot;
+    this.destinationSlot = destinationSlot;
+    this.middleSlot = middleSlot;
   }
 
   /**
@@ -16,8 +16,8 @@ export default class Move {
    * and the destination slot as filled.
    */
   public apply() {
-    this.slotDest.state = 'filled';
-    this.slotSrc.state = 'empty';
-    this.slotToRemove.state = 'empty';
+    this.destinationSlot.state = 'filled';
+    this.sourceSlot.state = 'empty';
+    this.middleSlot.state = 'empty';
   }
 }

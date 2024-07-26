@@ -4,8 +4,7 @@ import Slot from './Slot';
 
 export default class Board {
   public grid: Array<Slot[]> = [];
-  public moves = new Moves();
-  private adjacentFilledSlotsCount = 0;
+  private currentMoves = new Moves();
   private filledSlots: Set<Slot> = new Set();
 
   constructor() {
@@ -97,50 +96,95 @@ export default class Board {
     down: ((slot: Slot) => this.grid[slot.y + 1]?.[slot.x]).bind(this),
   };
 
-  public updateMoves(slot: Slot): void {
-    // loop through all possible directions
+  /**
+   * Loops through four directions to find a possible move;
+   * if move is possible, it is added to the internal moves array.
+   * 
+   * @param {Slot} slot - The slot to find possible moves from.
+   */
+  public setCurrentMoves(slot: Slot): void {
     Object.keys(this.slotLocator).forEach((direction: string) => {
-      // get potential slot to be removed, immediately next to the passed slot
-      const slotToBeRemoved = this.slotLocator[direction](slot);
-      if (slotToBeRemoved?.state === 'filled') {
-        // get potential slot to be replaced, one slot away from the passed slot
-        const slotToBeReplaced = this.slotLocator[direction](slotToBeRemoved);
-        if (slotToBeReplaced?.state === 'empty') {
-          // add as a possible move
-          this.moves.add(new Move(slot, slotToBeReplaced, slotToBeRemoved));
-        }
+      const newMove = this.getMove(slot, direction);
+      if (newMove) {
+        this.currentMoves.add(newMove);
       }
     });
   }
 
-  public get adjacentFilledSlots(): number {
-    this.adjacentFilledSlotsCount = 0;
-    this.grid.forEach((row: Slot[]) => {
-      row.forEach((slot: Slot) => {
-        if (slot.state === 'filled') {
-          Object.keys(this.slotLocator).forEach((direction: string) => {
-            const adjacentSlot = this.slotLocator[direction](slot);
-            if (adjacentSlot?.state === 'filled') {
-              this.adjacentFilledSlotsCount++;
-            }
-          });
+  /**
+   * Gets possible move from passed slot and desired direction.
+   * If no move is possible, returns `null`.
+   * 
+   * @param {Slot} slot - The slot to find possible move from. 
+   * @param {string} direction - The direction of the possible move.
+   * @returns {Move | null} - Returns the possible move, or null if none.
+   */
+  private getMove(slot: Slot, direction: string): Move | null {
+    // get potential slot to be removed, immediately next to the passed slot
+    const slotToBeRemoved = this.slotLocator[direction](slot);
+    if (slotToBeRemoved?.state === 'filled') {
+      // get potential slot to be replaced, one slot away from the passed slot
+      const slotToBeReplaced = this.slotLocator[direction](slotToBeRemoved);
+      if (slotToBeReplaced?.state === 'empty') {
+        // return new move
+        return new Move(slot, slotToBeReplaced, slotToBeRemoved);
+      }
+    }
+    return null;
+  }
+
+  public hasCurrentMoves(): boolean {
+    return !this.currentMoves.isEmpty()
+  }
+
+  public toggleCurrentMovesDestination(isMoveDestination: boolean) {
+    return this.currentMoves.toggleMovesDestination(isMoveDestination);
+  }
+
+  public flushCurrentMoves() {
+    this.currentMoves.flush();
+  }
+
+  public getCurrentMoveTo(slot: Slot): Move | undefined {
+    return this.currentMoves.getMoveTo(slot);
+  }
+
+  /**
+   * Applies passed current move, and also updates filled slots set by adding
+   * the destination slot (which becomes filled), and removing the source slot
+   * and the in-between slot (which were formerly filled).
+   * 
+   * @param {Move} currentMove - Move to be applied 
+   */
+  public applyCurrentMove(currentMove: Move) {
+    currentMove.apply();
+    this.filledSlots.add(currentMove.destinationSlot);
+    this.filledSlots.delete(currentMove.sourceSlot);
+    this.filledSlots.delete(currentMove.middleSlot);
+  }
+
+  /**
+   * Loops through all filled slots to check if they have any moves available.
+   * Returns an array of moves.
+   * 
+   * @todo Do we really need to store moves, or can we just count them?
+   * @returns {Array} - Array of available moves.
+   */
+  public getAvailableMoves(): Move[] {
+    const availableMoves: Move[] = [];
+    this.filledSlots.forEach((slot: Slot) => {
+      Object.keys(this.slotLocator).forEach((direction: string) => {
+        const newMove = this.getMove(slot, direction);
+        if (newMove) {
+          availableMoves.push(newMove);
         }
       });
     });
-
-    return this.adjacentFilledSlotsCount;
+    return availableMoves;
   }
 
   public getFilledSlots(): Set<Slot> {
     return this.filledSlots;
-  }
-
-  public addFilledSlot(slot: Slot) {
-    this.filledSlots.add(slot);
-  }
-
-  public removeFilledSlot(slot: Slot) {
-    this.filledSlots.delete(slot);
   }
 
   public print() {

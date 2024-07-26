@@ -24,42 +24,45 @@ function App() {
   }, [moveError]);
 
   const onSlotClick = (slot: Slot) => () => {
+    if (slot.state === 'none') {
+      console.log('no clicking on board...!')
+      return;
+    }
+
     // if there are any currently possible moves available, check for the one
     // that corresponds to the clicked slot, and apply it
-    if (!board.moves.isEmpty()) {
-      const selectedMove = board.moves.getSelectedMove(slot);
-      if (selectedMove) {
+    if (board.hasCurrentMoves()) {
+      const currentMove = board.getCurrentMoveTo(slot);
+      if (currentMove) {
         console.log('apply move!');
-        // @todo abstract out this operation within Board class
-        selectedMove.apply();
-        board.addFilledSlot(selectedMove.slotDest);
-        board.removeFilledSlot(selectedMove.slotSrc);
-        board.removeFilledSlot(selectedMove.slotToRemove);
+        board.applyCurrentMove(currentMove);
       } else {
         setMoveError(true);
         console.log('reset...');
       }
 
-      // hide all moves
-      board.moves.toggle(false);
+      // toggle off all current moves destination
+      board.toggleCurrentMovesDestination(false);
 
-      // remove all available moves
-      board.moves.flush();
+      // remove all current moves
+      board.flushCurrentMoves();
 
-      // global moves check
-      const adjacentFilledSlots = board.adjacentFilledSlots;
-      const filledSlots = board.getFilledSlots();
-      console.log('adjacentFilledSlots:', adjacentFilledSlots);
-      console.log('filledSlots:', filledSlots);
+      // check all available moves for every filled slot
+      const availableMoves = board.getAvailableMoves();
+      console.log('availableMoves:', availableMoves);
 
-      if (adjacentFilledSlots === 0) {
+      if (availableMoves.length === 0) {
         // if only one filled slot is left, game is won!
+        const filledSlots = board.getFilledSlots();
+        console.log('filledSlots:', filledSlots);
+        // @todo check also for two or three filled slots left, as a consolation prize...
         if (filledSlots.size === 1) {
+          // check if left slot is in the center of the grid for ULTIMATE PRIZE
           console.log('you win!');
+        } else {
+          // ...otherwise, game is over
+          console.log('no more moves available...!');
         }
-
-        // ...otherwise, game is over
-        console.log('no more moves available...!');
       }
 
       // render tick
@@ -67,22 +70,18 @@ function App() {
       return;
     }
 
-    // only start a move from filled slots
+    // start a move from filled slots only!
     if (slot.state === 'filled') {
-      // update possible moves from selected slot
-      board.updateMoves(slot);
+      // set current possible moves for selected slot
+      board.setCurrentMoves(slot);
 
-      if (board.moves.isEmpty()) {
+      if (!board.hasCurrentMoves()) {
         console.log('no available moves from there...!');
         setMoveError(true);
       }
 
-      // show available moves
-      board.moves.toggle(true);
-
-      // global moves check
-      const adjacentFilledSlots = board.adjacentFilledSlots;
-      console.log('adjacentFilledSlots:', adjacentFilledSlots);
+      // toggle on current moves destination; this will serve as a visual hint
+      board.toggleCurrentMovesDestination(true);
 
       // render tick
       setTick({});
@@ -128,7 +127,7 @@ function App() {
                         slot.state === 'filled',
                     },
                     {
-                      '!bg-emerald-100 cursor-pointer': slot.canReceive,
+                      '!bg-emerald-100 cursor-pointer': slot.isMoveDestination,
                     }
                   )}
                 ></span>
