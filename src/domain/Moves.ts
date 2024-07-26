@@ -41,4 +41,15 @@ export default class Moves {
       move.destinationSlot.isMoveDestination = isMoveDestination;
     });
   }
+
+  /**
+   * Toggles `isMoveMiddle` flag for every center slot.
+   * 
+   * @param {boolean} isMoveMiddle - Flag to be toggled.
+   */
+  public toggleMovesMiddle(isMoveMiddle: boolean) {
+    this.moves.forEach((move: Move) => {
+      move.middleSlot.isMoveMiddle = isMoveMiddle;
+    });
+  }
 }

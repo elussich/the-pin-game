@@ -137,6 +137,10 @@ export default class Board {
     return !this.currentMoves.isEmpty()
   }
 
+  public toggleCurrentMovesMiddle(isMoveMiddle: boolean) {
+    return this.currentMoves.toggleMovesMiddle(isMoveMiddle);
+  }
+
   public toggleCurrentMovesDestination(isMoveDestination: boolean) {
     return this.currentMoves.toggleMovesDestination(isMoveDestination);
   }

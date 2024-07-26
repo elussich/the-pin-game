@@ -41,7 +41,8 @@ function App() {
         console.log('reset...');
       }
 
-      // toggle off all current moves destination
+      // toggle off all current middle and destination moves
+      board.toggleCurrentMovesMiddle(false);
       board.toggleCurrentMovesDestination(false);
 
       // remove all current moves
@@ -80,7 +81,9 @@ function App() {
         setMoveError(true);
       }
 
-      // toggle on current moves destination; this will serve as a visual hint
+      // toggle on current middle and destination moves
+      // these will serve as a visual hint
+      board.toggleCurrentMovesMiddle(true);
       board.toggleCurrentMovesDestination(true);
 
       // render tick
@@ -94,11 +97,13 @@ function App() {
 
   return (
     <>
-      <h1 className='text-center text-3xl font-semibold text-slate-600 my-4'>The Pin Game</h1>
-      <h2 className='text-center text-xl text-slate-600'>Only one pin can survive!</h2>
+      <header className="mt-4">
+        <h1 className='text-center text-3xl font-semibold text-slate-600 mb-2'>The Pin Game</h1>
+        <h2 className='text-center text-xl text-slate-600'>Only one pin can survive!</h2>
+      </header>
       <div
         className={clsx(
-          'mx-auto w-fit m-8 p-4 bg-amber-100 shadow-lg rounded-lg border border-orange-200',
+          'mx-auto w-fit m-8 p-3 sm:p-4 bg-amber-100 shadow-lg rounded-lg border border-orange-200',
           {
             'animate-shake': moveError,
           }
@@ -108,14 +113,14 @@ function App() {
           <div className="flex" key={`${index}`}>
             {row.map((slot) => (
               <div
-                className="relative w-16 h-16"
+                className="relative w-12 h-12 sm:w-16 sm:h-16"
                 key={`${slot.x}-${slot.y}`}
                 onClick={onSlotClick(slot)}
               >
                 <span
                   className={clsx(
                     {
-                      'absolute w-10 h-10 m-3 rounded-full border border-orange-400':
+                      'absolute w-7 h-7 sm:w-10 sm:h-10 m-[0.625rem] sm:m-3 rounded-full border border-orange-400':
                         slot.state !== 'none',
                     },
                     {
@@ -123,8 +128,11 @@ function App() {
                         slot.state === 'empty',
                     },
                     {
-                      'bg-orange-300 shadow-md shadow-yellow-500 hover:bg-orange-400 cursor-pointer':
+                      'bg-orange-300 shadow-md shadow-yellow-500 hover:sm:bg-orange-400 cursor-pointer':
                         slot.state === 'filled',
+                    },
+                    {
+                      'opacity-50': slot.isMoveMiddle,
                     },
                     {
                       '!bg-emerald-100 cursor-pointer': slot.isMoveDestination,
