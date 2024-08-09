@@ -25,7 +25,6 @@ function App() {
 
   const onSlotClick = (slot: Slot) => () => {
     if (slot.state === 'none') {
-      console.log('no clicking on board...!')
       return;
     }
 
@@ -36,34 +35,35 @@ function App() {
       if (currentMove) {
         console.log('apply move!');
         board.applyCurrentMove(currentMove);
+
+        // toggle off all current middle and destination moves
+        board.toggleCurrentMovesMiddle(false);
+        board.toggleCurrentMovesDestination(false);
+
+        // important: remove all current moves after applying the move,
+        // so that player can play a new move
+        board.flushCurrentMoves();
+
+        // check all available moves for every filled slot
+        const availableMoves = board.getAvailableMoves();
+        console.log('availableMoves:', availableMoves);
+
+        if (availableMoves.length === 0) {
+          // if only one filled slot is left, game is won!
+          const filledSlots = board.getFilledSlots();
+          console.log('filledSlots:', filledSlots);
+          // @todo check also for two or three filled slots left, as a consolation prize...
+          if (filledSlots.size === 1) {
+            // check if left slot is in the center of the grid for ULTIMATE PRIZE
+            console.log('you win!');
+          } else {
+            // ...otherwise, game is over
+            console.log('no more moves available...!');
+          }
+        }
       } else {
         setMoveError(true);
         console.log('reset...');
-      }
-
-      // toggle off all current middle and destination moves
-      board.toggleCurrentMovesMiddle(false);
-      board.toggleCurrentMovesDestination(false);
-
-      // remove all current moves
-      board.flushCurrentMoves();
-
-      // check all available moves for every filled slot
-      const availableMoves = board.getAvailableMoves();
-      console.log('availableMoves:', availableMoves);
-
-      if (availableMoves.length === 0) {
-        // if only one filled slot is left, game is won!
-        const filledSlots = board.getFilledSlots();
-        console.log('filledSlots:', filledSlots);
-        // @todo check also for two or three filled slots left, as a consolation prize...
-        if (filledSlots.size === 1) {
-          // check if left slot is in the center of the grid for ULTIMATE PRIZE
-          console.log('you win!');
-        } else {
-          // ...otherwise, game is over
-          console.log('no more moves available...!');
-        }
       }
 
       // render tick
@@ -76,15 +76,15 @@ function App() {
       // set current possible moves for selected slot
       board.setCurrentMoves(slot);
 
-      if (!board.hasCurrentMoves()) {
+      if (board.hasCurrentMoves()) {
+        // toggle on current middle and destination moves
+        // these will serve as a visual hint
+        board.toggleCurrentMovesMiddle(true);
+        board.toggleCurrentMovesDestination(true);
+      } else {
         console.log('no available moves from there...!');
         setMoveError(true);
       }
-
-      // toggle on current middle and destination moves
-      // these will serve as a visual hint
-      board.toggleCurrentMovesMiddle(true);
-      board.toggleCurrentMovesDestination(true);
 
       // render tick
       setTick({});
