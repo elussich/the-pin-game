@@ -7,7 +7,27 @@
     <title>The Pin Game</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root">
+      <div
+        class="mx-auto w-fit m-8 p-3 sm:p-4 bg-amber-100 shadow-lg rounded-lg border border-orange-200"
+        x-data="game"
+      >
+        <template x-for="(row, rowIndex) in board.grid" :key="rowIndex">
+          <div class="flex">
+            <template x-for="slot in row" :key="`${slot.x}-${slot.y}`">
+              <div
+                class="relative w-12 h-12 sm:w-16 sm:h-16"
+                @click="onSlotClick(slot)"
+              >
+                <span
+                  :class="getSlotClasses(slot)"
+                ></span>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
