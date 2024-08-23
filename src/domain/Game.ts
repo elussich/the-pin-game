@@ -1,11 +1,30 @@
 import Board from './Board';
+import GameEventManager from './GameEventManager';
 import Slot from './Slot';
 
 export default class Game {
   board: Board;
+  notifier: GameEventManager;
 
   constructor() {
     this.board = new Board();
+    this.notifier = new GameEventManager();
+  }
+
+  onMoveError(callback: (...args: any[]) => void) {
+    this.notifier.on('MOVE_ERROR', callback);
+  }
+
+  onMovesUnavailable(callback: (...args: any[]) => void) {
+    this.notifier.on('NO_MOVES', callback);
+  }
+
+  onUserLost(callback: (...args: any[]) => void) {
+    this.notifier.on('USER_LOST', callback);
+  }
+
+  onUserWon(callback: (...args: any[]) => void) {
+    this.notifier.on('USER_WON', callback);
   }
 
   onSlotClick(slot: Slot) {
@@ -41,15 +60,18 @@ export default class Game {
           if (filledSlots.size === 1) {
             // check if left slot is in the center of the grid for ULTIMATE PRIZE
             console.log('you win!');
+            this.notifier.emit('USER_WON');
           } else {
             // ...otherwise, game is over
             console.log('no more moves available...!');
+            this.notifier.emit('USER_LOST');
           }
         }
       } else {
         // @todo handle error
         // setMoveError(true);
         console.log('reset...');
+        this.notifier.emit('MOVE_ERROR');
       }
 
       // early break
@@ -70,6 +92,7 @@ export default class Game {
         console.log('no available moves from there...!');
         // @todo handle error
         // setMoveError(true);
+        this.notifier.emit('NO_MOVES');
       }
 
       // early break
@@ -79,5 +102,6 @@ export default class Game {
     console.log('cannot move from there...');
     // @todo handle error
     // setMoveError(true);
+    this.notifier.emit('MOVE_ERROR');
   }
 }

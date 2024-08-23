@@ -5,10 +5,21 @@ import './index.css';
 
 import Game from './domain/Game';
 
+const game = new Game();
+
 // initialize reactive data
 Alpine.data('game', () => ({
+  init: () => {
+    game.onMoveError(() => {
+      console.log('GameEvent MOVE_ERROR');
+    });
+    game.onMovesUnavailable(() => {
+      console.log('GameEvent NO_MOVES');
+    });
+  },
+
   // initialize game
-  game: new Game(),
+  game,
 
   // assign classes to slot element based on its state
   getSlotClasses: (slot) => clsx(
