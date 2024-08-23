@@ -35,7 +35,7 @@
           class="w-fit p-3 sm:p-4 bg-amber-100 shadow-lg rounded-lg border border-orange-200"
           x-data="game"
         >
-          <template x-for="(row, rowIndex) in board.grid" :key="rowIndex">
+          <template x-for="(row, rowIndex) in game.board.grid" :key="rowIndex">
             <div class="flex">
               <template x-for="slot in row" :key="`${slot.x}-${slot.y}`">
                 <div
