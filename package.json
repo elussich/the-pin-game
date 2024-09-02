@@ -11,18 +11,26 @@
     "test": "jest"
   },
   "dependencies": {
-    "alpinejs": "^3.14.1",
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.2",
+    "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
+    "@testing-library/react": "^16.0.0",
     "@types/jest": "^29.5.12",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
+    "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "babel-jest": "^29.7.0",
     "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.8",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.4.39",
